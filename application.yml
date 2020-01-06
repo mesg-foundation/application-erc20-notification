@@ -45,7 +45,7 @@ steps:
     taskKey: execute
     inputs:
       code: >
-        module.exports = (data) => `Transfer ${parseInt(data.value) / Math.pow(10,18)} MESG token from ${data.from} to ${data.to}, See the transaction as https://ropsten.etherscan.io/tx/${data.transactionHash}`
+        module.exports = (data) => `Transfer ${parseInt(data.value) / Math.pow(10,18)} tokens from "${data.from}" to "${data.to}". See the transaction as https://ropsten.etherscan.io/tx/${data.transactionHash}`
       inputs:
         transactionHash: { stepKey: store, key: result.transactionHash }
         from: { stepKey: store, key: result.from }
@@ -58,8 +58,8 @@ steps:
         - SENDGRID_API_KEY=$(env:SENDGRID_API_KEY)
     taskKey: send
     inputs:
-      from: 'contact@mesg.com'
-      to: 'ruthamnong.thotsaphon@gmail.com'
-      subject: 'Transfer MESG tokens'
+      from: 'test@erc20notification.com'
+      to: '__YOUR_EMAIL_HERE__'
+      subject: 'ERC20 transfer'
       text:
         key: result
