@@ -14,7 +14,7 @@ You can run the following command to install and start the Core:
 Download the source code of the application. You can clone this repository by using the following command:
 
 ```bash
-git clone https://github.com/
+git clone https://github.com/mesg-foundation/application-erc20-notification.git
 ```
 
 ## Create configuration file
