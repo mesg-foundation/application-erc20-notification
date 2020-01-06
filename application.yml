@@ -1,0 +1,65 @@
+name: ERC20 notification
+steps:
+  - type: trigger
+    instance:
+      src: https://github.com/mesg-foundation/service-ethereum-erc20
+      env:
+        - PROVIDER_ENDPOINT=$(env:PROVIDER_ENDPOINT)
+        - BLOCK_CONFIRMATIONS=0
+    eventKey: transfer
+  - type: task
+    key: store
+    instance:
+      src: https://github.com/mesg-foundation/service-js-function
+    taskKey: execute
+    inputs:
+      code: >
+        module.exports = data => ({
+          transactionHash: data.transactionHash,
+          from: data.from,
+          to: data.to,
+          value: data.value,
+          contractAddress: data.contractAddress.toLowerCase()
+        })
+      inputs:
+        transactionHash: { key: transactionHash }
+        from: { key: from }
+        to: { key: to }
+        value: { key: value }
+        contractAddress: { key: contractAddress }
+  # this service will remove when filter is fixed.
+  - type: task
+    instance:
+      src: https://github.com/blackinno/mesg-service-filter
+    taskKey: filter
+    inputs:
+      data: { key: result.contractAddress }
+      predicate: eq
+      value: '0xd14a3d6b94016e455af5eb7f329bc572ea626c5f'
+  - type: filter
+    conditions:
+      match: 'TRUE'
+  - type: task
+    instance:
+      src: https://github.com/mesg-foundation/service-js-function
+    taskKey: execute
+    inputs:
+      code: >
+        module.exports = (data) => `Transfer ${parseInt(data.value) / Math.pow(10,18)} MESG token from ${data.from} to ${data.to}, See the transaction as https://ropsten.etherscan.io/tx/${data.transactionHash}`
+      inputs:
+        transactionHash: { stepKey: store, key: result.transactionHash }
+        from: { stepKey: store, key: result.from }
+        to: { stepKey: store, key: result.to }
+        value: { stepKey: store, key: result.value }
+  - type: task
+    instance:
+      src: https://github.com/mesg-foundation/service-email-sendgrid
+      env:
+        - SENDGRID_API_KEY=$(env:SENDGRID_API_KEY)
+    taskKey: send
+    inputs:
+      from: 'contact@mesg.com'
+      to: 'ruthamnong.thotsaphon@gmail.com'
+      subject: 'Transfer MESG tokens'
+      text:
+        key: result
