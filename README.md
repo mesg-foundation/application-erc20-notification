@@ -24,6 +24,27 @@ Copy the `.env.example` to `.env`.
 This file contains required configurations needed for the application.
 You need to replace the `...` by the right value.
 
+## Replace application.yml
+
+You need to replace email at `'__YOUR_EMAIL_HERE__'` by your email.
+
+```yml
+  ...
+  - type: task
+    instance:
+      src: https://github.com/mesg-foundation/service-email-sendgrid
+      env:
+        - SENDGRID_API_KEY=$(env:SENDGRID_API_KEY)
+    taskKey: send
+    inputs:
+      from: 'test@erc20notification.com'
+      to: '__YOUR_EMAIL_HERE__'
+      subject: 'ERC20 transfer'
+      text:
+        key: result
+  ...
+```
+
 ## Deploy MESG process
 
 ```bash
